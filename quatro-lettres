@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<link rel="icon" sizes="192x192" href="icon-192.png">
+
+
+<meta charset="UTF-8">
+<title>QUATRO-LETTRES</title>
+
+<style>
+body{font-family:"Century Gothic",sans-serif;background:#fff;text-align:center;margin:0}
+
+/* Clavier NOIR / BLANC */
+body.clavier-noir .key{background:#000;color:#fff;border-color:#000}
+body.clavier-blanc .key{background:#fff;color:#000;border-color:#555}
+
+/* Clavier couleur par grille */
+.key.vert{background:#00a000;color:#fff;border-color:#007700}
+.key.bleu{background:#003eff;color:#fff;border-color:#0028aa}
+.key.rouge{background:#cc0000;color:#fff;border-color:#880000}
+.key.noir{background:#000;color:#fff;border-color:#000}
+
+h1{font-size:38px;margin:20px 0 10px}
+.legend{font-style:italic}
+.legend a{cursor:pointer;text-decoration:none;color:inherit}
+.legend a:hover{text-decoration:underline}
+
+.levels{display:flex;justify-content:center;gap:12px;margin:8px 0}
+.level{width:36px;height:36px;border:2px solid #000;cursor:pointer}
+.green{background:#00c000}
+.blue{background:#0066ff}
+.red{background:#e00000}
+.black{background:#000}
+
+#grid-wrapper{display:inline-block;padding:18px}
+#grid-wrapper.vert{background:#00a000}
+#grid-wrapper.bleu{background:#003eff}
+#grid-wrapper.rouge{background:#cc0000}
+#grid-wrapper.noir{background:#000}
+
+#grid{
+  display:grid;
+  grid-template-columns:repeat(4,90px);
+  grid-template-rows:repeat(4,90px)
+}
+.cell{
+  border:1px solid #333;
+  font-family:"Century Schoolbook",serif;
+  font-size:46px;
+  font-weight:600;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;user-select:none
+}
+.cell.vert{background:#e6f7e6;color:#006600}
+.cell.bleu{background:#e6f0ff;color:#0033cc}
+.cell.rouge{background:#ffe6e6;color:#990000}
+.cell.noir{background:#fff;color:#000}
+.cell.blanc{background:#fff!important}
+.cell.selected{outline:3px solid #888}
+
+#voyelles{margin:14px 0 10px}
+#consonnes{margin:10px 0 18px}
+.keyboard-row{display:flex;justify-content:center;margin:6px}
+.key{
+  width:40px;height:40px;margin:4px;
+  border:2px solid currentColor;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:20px;border-radius:6px
+}
+
+.actions{margin:12px}
+.actions button{
+  padding:6px 16px;border:2px solid #555;
+  background:#eee;cursor:pointer
+}
+
+#modalBg{
+  position:fixed;inset:0;background:rgba(0,0,0,.4);
+  display:none;z-index:1000
+}
+#modalBox{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  background:#fff;border-radius:20px;
+  padding:26px 30px;max-width:560px;
+  pointer-events:none;text-align:center
+}
+#modalBox.vert{border:4px solid #00a000;color:#006600}
+#modalBox.bleu{border:4px solid #003eff;color:#0033cc}
+#modalBox.rouge{border:4px solid #cc0000;color:#990000}
+#modalBox.noir{border:4px solid #000;color:#000}
+
+/* ===== ONGLET COMMENT JOUER ===== */
+.help-box{
+  display:inline-block;
+  margin:12px auto 8px;
+  padding:8px 16px;
+  border:2px dashed #666;
+  background:#ffffff;
+  font-style:italic;
+  cursor:pointer;
+}
+.help-box:hover{
+  background:#f5f5f5;
+}
+</style>
+</head>
+
+<body>
+
+<h1>QUATRO-LETTRES</h1>
+
+<div class="help-box" onclick="showRules()">
+  Comment jouer ?
+</div>
+
+<div class="legend">Choisir une couleur de grille</div>
+
+<div class="levels">
+  <div class="level green" onclick="setLvl('VERT')"></div>
+  <div class="level blue" onclick="setLvl('BLEU')"></div>
+  <div class="level red" onclick="setLvl('ROUGE')"></div>
+  <div class="level black" onclick="setLvl('NOIR')"></div>
+</div>
+
+<div class="legend">
+  Choisir la couleur du clavier :
+  <a onclick="setKeyboard('noir')">NOIR</a> –
+  <a onclick="setKeyboard('blanc')">BLANC</a>
+</div>
+
+<div id="voyelles"></div>
+
+<div id="grid-wrapper"><div id="grid"></div></div>
+
+<div class="actions">
+  <button onclick="valider()">VALIDER</button>
+  <button onclick="nouvelle()">NOUVELLE PARTIE</button>
+</div>
+
+<div id="consonnes"></div>
+
+<div id="modalBg"><div id="modalBox"></div></div>
+
+<script>
+/* ================= DICTIONNAIRE (TON TEXTE BRUT) ================= */
+const RAW = `
+A ABAT ABEE ABBE ABER ABLE ABRI ABOI ABUS ACENS ACHE ACNE ACON ACRA ACRE ACRO ACTE
+ADOS AEDE AERE AERO AFIN AFRO AGEE AGHA AGIO AGIR AIDE AIGU AINE AINS AILE AIRE
+AISE ALEA ALLO ALOI ALTO ALUN AMAN AMAS AMEN AMER AMIE AMOK ANAL ANEE ANON ANGE
+ANIL ANIS ANSE ANTE ANTI ANUS AOUT APAX APEX APRE APTE ARAC ARAK ARDU AREC ARIA
+ARUM ARME APIOL ASSE ASSA ASTER ATRE AUBE AUGE AUNE AURA AUTO AVAL AVEC AVEN AVEU
+AVIS AVOIR AXER AXIS AYAN AZUR
+B BABA BABY BAIE BAIL BAIN BAIS BANC BANG BARD BASE BAVE BEER BIEN BILE BINE BISE
+BLED BLET BLEU BLOC BOIS BOCK BODY BOME BOND BONI BOOK BOOM BOTE BORD BORE BOUC
+BOUE BOUM BOUT BOXE BRAI BRAN BRAS BREF BREN BRIE BRIG BRIN BRIS BROC BROU BRRR
+BRUN BRUT BUBE BUEE BUSC BUSE BUIS BURE BUTE BUYE
+C CADE CAFE CADI CAGE CAID CATA CAPA CAPE CASE CECI CEPE CHAR CHAT CHEF CHIC CHOC CHUT
+CIEL CLAC CLAN CLEF CLIC CLIN CLOU CLOS CLUB COBE COLA COLI COLT COTE COUP COUT
+CRET CRAC CRIC CRUE CUIR CUIT CURE
+D DACE DADA DAIM DAIS DANS DEFI DEME DENI DIRE DITE DITO DIVA DIVE DOCK DODO DODU
+DOGE DOME DONA DORE DOSE DOUE DONC DONT DOPE DOUX DRAG DRAP DRUE DUEL DUIT DUPE
+DURE DYKE
+E EBAT ECHO ECOT ECRU EDEN EGAL ELAN ELFE ELLE ELUE EMBU EMEU EMIR EMMI EMOI EMUE
+ENDO ENTE ENVI EPAR EPEE EPOI EQUI ERGO EROS ERRE ERSE ESSE ESTE ETAI ETAL ETAT
+ETAU ETOC ETRE ETUI EURO EVOE EXIL EXIT EXON
+F FACE FADA FADE FAIM FAIT FAIX FAME FANE FAON FARD FART FATE FAUX FEAL FEER FELE
+FERA FERU FETU FEVE FIAT FIEF FIEL FIER FIFI FIGE FILE FINE FINI FION FISC FIXE
+FLAN FLET FLIC FLOC FLOT FLOU FLUX FOIE FOIN FOIS FOND FORT FOUR FRAC FRAI FRET
+FRIC FRIT FROC FUEL FUIE FUIR FULL FUME FUNE FUTE
+G GADE GAGE GAIN GALA GALE GANG GANO GANT GARE GARS GAVE GAZE GAZO GEAI GENE GENS
+GENT GEUM GIGA GIRL GITE GLAS GLIE GLUE GNON GNOU GOAL GOGO GOND GONE GONG GORD
+GORE GOTH GOUM GOUR GOUT GRAM GRAS GRAT GRAY GREC GRES GRIL GRIS GROG GROS GRUE
+GUET GUIB
+H HADJ HAHA HAHE HAIE HAIK HAIR HALE HALL HALO HARO HASE HAST HATE HAUT HAVE HEIN
+HEME HEMI HERE HEUR HIER HILE HOCA HOIR HOLA HOME HOMO HORS HOTE HOTU HOUE HOUP
+HOUX HUEE HUER HUIS HUIT HUNE HURE HYPO
+I IBID IBIS IDEE IDEM IDEO IDIO IDES IGNE IGNI ILES ILET ILOT IMAN INCA INDE INDO
+INDU INNE INOX INRI IOTA IRIS ISBA ISSU ITEM ITOU IULE IVRE IXIA
+J JADE JAIN JALE JARD JARS JASS JAVA JAZZ JEAN JEEP JETE JEUN JOIE JOLI JONC JOUE
+JOUG JOUR JUBE JUDO JUGE JUIF JUIN JULE JUPE JURE JURY JUTE
+K KAEY KAKI KALI KAMI KARI KART KAVA KAWA KCAL KEFIR KEPI KERA KHAN KHOL KIEF KILO
+KILT KING KINO KOHL KOLA KORE KRAK KSAR KVAS KWAS
+L LACE LACK LACS LADY LAIE LAIC LAID LAIS LAIT LAMA LAME LAND LAPS LARD LARE LAST
+LAVE LAYE LEDE LEGS LENT LESE LEST LEUR LEVE LIAS LICE LIDO LIED LIEN LIER LIEU
+LIFT LIGE LIME LINO LION LIRE LISE LIVE LOBE LOCH LOCO LODS LOGE LOGO LOIN LOIR
+LONG LORD LORE LORI LORS LOTO LOUP LOZE LUGE LULU LUMP LUNE LUTH LUXE LYNX LYRE LYSE
+M MACH MAGE MAIA MAIE MAIL MAIN MAIS MAKI MALE MALT MANA MARA MARC MARE MARI MARK
+MARS MATE MAYE MAYA MBAR MEAT MEDE MEGA MELO MEME MEMO MENU MEON MERE MESA MESS
+META METS MEUM MICA MIDI MIEL MIEN MILE MIME MINE MINI MIRE MISE MISS MITE MODE
+MOIE MOIS MOKA MOLE MOLY MOME MONS MONT MORE MORS MORT MOTO MOUE MOUT MOXA MOYE
+MUEE MUER MUET MUGE MUID MULE MURE MUSC MUSE
+N NABI NAFE NAGE NAIF NAIN NAJA NANO NAOS NARD NASI NECK NEON NEPE NERF NEUF NEVE
+NICE NIER NIXE NOCE NOEL NOIR NOIX NOME NONE NORD NOSO NOTA NOTE NOUE NOUS NOVA
+NOYE NUEE NUER NUIT
+O OBEL OBIER OBIT OBUS OCRE OEIL OEUF OLLE OING OINT OMIS ONDE ONYX ONZE OPEN OPUS
+ORAL ORBE ORDO ORGE ORIN ORLE ORME ORNE ORYX OSER OSSU OSTO OTER OUIE OUIR OURA
+OUZA OVIN OXER
+P PACA PACE PACK PAKS PAGE PAIE PAIN PAIR PAIX PALE PALI PALU PAON PAPA PAPE PARA
+PARC PARE PARI PART PATE PATIS PAVE PAYE PAYS PEAN PEAU PEDI PEDO PELE PELU PENE
+PEON PERE PERI PERS PESO PEUH PEUL PEUR PHOT PIAF PIAN PICA PICO PIED PIEU PIGE
+PILE PINE PION PIOT PIPA PIPE PIPI PIRE PISE PITA PITE PIVE PLAN PLAT PLIE PLOC
+PLOT PLUS PNEU POGE POIL POIS POIX POLE POLI POLL POLO POLY PONT POOL POPE PORC
+PORE PORT POSE POST POTE POUF POUR PRAO PRES PRET PRIX PROU PUCE PUER PUFF PUIS
+PULL PUMA PUPE PURE PUTE PUTT
+Q QUAD QUAI QUEL QUIA QUIS QUIZ QUOI
+R RABE RACA RACE RACK RADE RAGE RAIA RAID RAIE RAIL RAIS RAIZ RAJA RAKI RALE RAME
+RAMI RAMS RANE RANG RANI RANZ RAPE RAPT RARE RASE RASH RATA RATE RAVE RAVI RAYE
+REAL REEL REER REIN REIS RENE REPS REPU RETS REVE RHEO RHUM RHUS RIAD RIAL RICH
+RIDE RIEL RIEN RIFF RIFT RIME RING RIPE RIRE RIVE RIXE RIZE ROBE ROCK ROLE ROND
+ROSE ROTE ROTI ROUC ROUE ROUF ROUT RUDE RUEE RUER RUMB RUNE RUSE RUSH RYAD
+S SAGA SAGE SAIE SAIN SAKE SAKI SALE SANG SANS SAPA SAPE SARI SATI SAUF SAUR SAXE
+SAXO SCAT SCEL SCIE SEAU SEIN SELF SEME SEMI SENE SENS SEPS SERE SERF SERO SEUL
+SEVE SEXE SEXY SHORT SHOW SIDA SILO SINO SIPO SIRE SISE SITE SLAM SLIP SLOM SMOG
+SNOB SODA SODE SOFA SOFI SOIE SOIF SOIN SOIR SOIT SOJA SOLE SOLO SOMA SONA SONO
+SORA SORE SORT SOUE SOUK SOUL SOUS SPEE SPIC SPIN SPOT SRAS STAR STOP STUC SUEE
+SUER SUET SUIE SUIF SUMO SURE SURF
+T TABI TACO TACT TAEL TAIE TAIN TALC TANK TANT TAON TAPA TAPE TARD TARE TARI TARO
+TASER TAUD TAUX TAXE TAXI TECK TELE TELL TENU TERA TEST TETE TETU THAI THON THUG
+TIAN TIEN TIDE TIKI TILT TINE TIPI TIRE TITI TOFU TOGE TOIT TOLE TOME TONG TOPO
+TORE TORR TORS TORT TORY TOUC TOUG TOUR TOUS TOUT TOUX TOXI TOXO TRAC TREK TRES
+TRIE TRIL TRIN TRIO TRIP TROC TROP TROT TROU TRUC TSAR TUBA TUBE TUER TUNE TUPI
+TURC TURF TUTU TYPE TZAR
+U UBAC ULVE UNAU UNIE UNIR URDU UREE URNE URUS USEE USER UVEE UPAS URBI
+V VADE VAIN VAIR VAMP VAPE VARE VASE VASO VEAU VECU VEDA VELO VELU VENT VENU VERS
+VERT VETO VETU VEUF VICE VIDE VILE VINA VIOL VIRE VISA VISE VISIR VITE VIVE VOIE
+VOIR VOIX VOLE VOLT VOMI VOTE VOUS VRAC VRAI
+W WATT WHIG WIFI WOKE
+X XENO XERO XYLO
+Y YACK YANG YARD YASS YAWL YETI YEUX YEYE YOGA YOGI YOLE YOUP YOYO YUAN YUZU
+Z ZAIN ZANI ZEBU ZELE ZEND ZEON ZERO ZEST ZETA ZINC ZIST ZIZI ZONA ZONE ZOOM ZOUK ZOZO
+`;
+
+const WORDS = new Set(RAW.split(/\s+/).filter(w=>w.length===4));
+
+/* ================= ÉTAT (4 PARTIES INDÉPENDANTES) ================= */
+const STATES = {
+  VERT:  { grid:Array(16).fill(""), touched:Array(16).fill(false), started:false },
+  BLEU:  { grid:Array(16).fill(""), touched:Array(16).fill(false), started:false },
+  ROUGE: { grid:Array(16).fill(""), touched:Array(16).fill(false), started:false },
+  NOIR:  { grid:Array(16).fill(""), touched:Array(16).fill(false), started:false }
+};
+
+let selected=null;
+let LVL="VERT";
+
+function S(){ return STATES[LVL]; }          // state courant
+function G(){ return STATES[LVL].grid; }     // grille courante
+function T(){ return STATES[LVL].touched; }  // touched courant
+
+/* ================= GRILLE ================= */
+function initGrid(){
+  gridDiv.innerHTML="";
+  for(let i=0;i<16;i++){
+    const c=document.createElement("div");
+    c.className="cell";
+    c.onclick=()=>cellClick(i);
+    gridDiv.appendChild(c);
+  }
+}
+function refresh(){
+  document.querySelectorAll(".cell").forEach((c,i)=>{
+    c.textContent=G()[i];
+    c.className="cell "+LVL.toLowerCase();
+    if(T()[i])c.classList.add("blanc");
+    if(selected===i)c.classList.add("selected");
+  });
+}
+function cellClick(i){
+  if(G()[i]){G()[i]="";T()[i]=true;selected=null}
+  else selected=i;
+  refresh();
+}
+
+/* ================= CLAVIERS ================= */
+function key(L){
+  const k=document.createElement("div");
+  k.className="key "+LVL.toLowerCase();
+  k.textContent=L;
+  k.onclick=()=>{
+    if(selected!==null){
+      G()[selected]=L;
+      T()[selected]=true;
+      selected=null;
+      refresh();
+    }
+  };
+  return k;
+}
+function initKeyboards(){
+  voyelles.innerHTML="";
+  const vr=document.createElement("div");
+  vr.className="keyboard-row";
+  "AEIOUY".split("").forEach(L=>vr.appendChild(key(L)));
+  voyelles.appendChild(vr);
+
+  consonnes.innerHTML="";
+  ["BCDFG","HJKLM","NPQRS","TVWXZ"].forEach(r=>{
+    const d=document.createElement("div");
+    d.className="keyboard-row";
+    r.split("").forEach(L=>d.appendChild(key(L)));
+    consonnes.appendChild(d);
+  });
+}
+
+/* ================= CLAVIER PC ================= */
+document.addEventListener("keydown",e=>{
+  if(selected===null)return;
+  const k=e.key.toUpperCase();
+  if(k>="A"&&k<="Z"){
+    G()[selected]=k;T()[selected]=true;selected=null;refresh();e.preventDefault();
+  }
+  if(e.key==="Backspace"||e.key==="Delete"){
+    G()[selected]="";T()[selected]=true;selected=null;refresh();e.preventDefault();
+  }
+});
+
+/* ================= JEU ================= */
+function randomVowelFor(state){
+  const v="AEIOU";
+  const p=Math.floor(Math.random()*16);
+  state.grid[p]=v[Math.floor(Math.random()*v.length)];
+  state.touched[p]=true;
+}
+function randomVowel(){
+  randomVowelFor(S());
+}
+
+function setKeyboard(m){
+  document.body.classList.remove("clavier-noir","clavier-blanc");
+  document.body.classList.add(m==="noir"?"clavier-noir":"clavier-blanc");
+}
+function setKeyboardAuto(){document.body.classList.remove("clavier-noir","clavier-blanc")}
+
+/* ✅ CORRECTION PRINCIPALE :
+   setLvl() = NAVIGATION UNIQUEMENT
+   (plus de grid.fill / touched.fill / randomVowel ici)
+*/
+function setLvl(l){
+  LVL=l;
+  selected=null;
+
+  gridWrapper.className=l.toLowerCase();
+  setKeyboardAuto();
+  initKeyboards();
+
+  // Si c'est la première fois qu'on va sur cette couleur : on initialise UNE fois
+  if(!S().started){
+    S().grid.fill("");
+    S().touched.fill(false);
+    randomVowelFor(S());
+    S().started=true;
+  }
+
+  refresh();
+}
+
+/* ✅ NOUVELLE PARTIE = RESET LOCAL (couleur courante uniquement) */
+function nouvelle(){
+  S().grid.fill("");
+  S().touched.fill(false);
+  selected=null;
+  randomVowelFor(S());
+  S().started=true;
+  refresh();
+}
+
+/* ================= VALIDATION ================= */
+function valider(){
+  if(G().some(x=>!x)){
+    showModal("<h2>✗ Grille non valide</h2>Grille incomplète.");
+    return;
+  }
+  const rows=[
+    G().slice(0,4).join(""),
+    G().slice(4,8).join(""),
+    G().slice(8,12).join(""),
+    G().slice(12,16).join("")
+  ];
+  const cols=[
+    G()[0]+G()[4]+G()[8]+G()[12],
+    G()[1]+G()[5]+G()[9]+G()[13],
+    G()[2]+G()[6]+G()[10]+G()[14],
+    G()[3]+G()[7]+G()[11]+G()[15]
+  ];
+  const ok=[...rows,...cols].every(w=>WORDS.has(w));
+  showModal(ok
+    ?"<h2>🎉 Bravo !</h2>Grille valide !"
+    :"<h2>✗ Grille non valide</h2>Vous pouvez continuer.");
+}
+
+/* ================= POPUP ================= */
+function showModal(html){
+  modalBox.className=LVL.toLowerCase();
+  modalBox.innerHTML=html;
+  modalBg.style.display="block";
+  modalBg.onclick=()=>modalBg.style.display="none";
+}
+function showRules(){
+  showModal(`
+    <h2>COMMENT JOUER ?</h2>
+    Choisir une couleur de grille.<br><br>
+    Cliquez sur une case de la grille puis tapez une lettre au clavier<br><br>
+    Pour effacer : cliquez sur la lettre choisie<br><br>
+    🎉 Bonne partie !
+  `);
+}
+
+/* ================= INIT ================= */
+const gridDiv=document.getElementById("grid");
+const gridWrapper=document.getElementById("grid-wrapper");
+const voyelles=document.getElementById("voyelles");
+const consonnes=document.getElementById("consonnes");
+const modalBg=document.getElementById("modalBg");
+const modalBox=document.getElementById("modalBox");
+
+initGrid();
+setLvl("VERT"); // initialise VERT une seule fois puis navigation conserve tout
+</script>
+
+</body>
+</html>
