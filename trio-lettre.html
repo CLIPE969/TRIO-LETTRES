@@ -12,23 +12,21 @@ body{
   margin:0;
 }
 
-/* ===== Clavier NOIR / BLANC (manuel) ===== */
+/* ===== Clavier NOIR / BLANC ===== */
 body.clavier-noir .key{background:#000;color:#fff;border-color:#000}
 body.clavier-blanc .key{background:#fff;color:#000;border-color:#555}
 
-/* ===== Clavier COULEUR par GRILLE ===== */
+/* ===== Clavier COULEUR ===== */
 .key.vert{background:#00a000;color:#fff;border-color:#007700}
 .key.bleu{background:#003eff;color:#fff;border-color:#0028aa}
 .key.rouge{background:#cc0000;color:#fff;border-color:#880000}
 .key.noir{background:#000;color:#fff;border-color:#000}
 
-/* ===== Titres ===== */
 h1{font-size:38px;margin:20px 0 10px}
 .legend{font-style:italic}
 .legend a{cursor:pointer;text-decoration:none;color:inherit}
 .legend a:hover{text-decoration:underline}
 
-/* ===== NIVEAUX ===== */
 .levels{display:flex;justify-content:center;gap:12px;margin:8px 0}
 .level{width:36px;height:36px;border:2px solid #000;cursor:pointer}
 .green{background:#00c000}
@@ -36,7 +34,7 @@ h1{font-size:38px;margin:20px 0 10px}
 .red{background:#e00000}
 .black{background:#000}
 
-/* ===== DICTIONNAIRE ===== */
+/* ===== DICO ===== */
 #dicoBar{display:flex;justify-content:center;gap:10px;font-weight:bold;margin-top:10px}
 #dicoWords{
   max-width:900px;margin:6px auto 14px;
@@ -66,8 +64,8 @@ h1{font-size:38px;margin:20px 0 10px}
 .cell.bleu{background:#e6f0ff;color:#0033cc}
 .cell.rouge{background:#ffe6e6;color:#990000}
 .cell.noir{background:#fff;color:#000}
-.cell.blanc{background:#fff!important}
 .cell.selected{outline:3px solid #888}
+.cell.blanc{background:#fff!important}
 
 /* ===== CLAVIERS ===== */
 #voyelles{margin:14px 0 10px}
@@ -105,7 +103,7 @@ h1{font-size:38px;margin:20px 0 10px}
 #modalBox.rouge{border:4px solid #cc0000;color:#990000}
 #modalBox.noir{border:4px solid #000;color:#000}
 
-/* ===== ONGLET COMMENT JOUER ===== */
+/* ===== AIDE ===== */
 .help-box{
   display:inline-block;
   margin:12px auto 8px;
@@ -115,9 +113,7 @@ h1{font-size:38px;margin:20px 0 10px}
   font-style:italic;
   cursor:pointer;
 }
-.help-box:hover{
-  background:#f5f5f5;
-}
+.help-box:hover{background:#f5f5f5;}
 </style>
 </head>
 
@@ -125,9 +121,7 @@ h1{font-size:38px;margin:20px 0 10px}
 
 <h1>TRIO-LETTRES</h1>
 
-<div class="help-box" onclick="showRules()">
-  Comment jouer ?
-</div>
+<div class="help-box" onclick="showRules()">Comment jouer ?</div>
 
 <div class="legend">Choisir une couleur de grille</div>
 
@@ -164,40 +158,19 @@ h1{font-size:38px;margin:20px 0 10px}
 <div id="modalBg"><div id="modalBox"></div></div>
 
 <script>
-/* ================= DONNÉES ================= */
-const RAW_WORDS=`ABC ACE ADO AGA AGE AHI AIE AIL AIR AIS ALE ALU AME AMI ANA ANE API ARA ARE ARC ARS ART AUX AVE AXE
-BAC BAH BAI BAL BAN BAR BAS BAT BAU BEE BEC BEL BEN BER BEY BIO BIS BIT BLE BOA BOF BOL BON BOT BOX BOY BRU BUN BUS BUT
-CAB CAO CAL CAP CAR CAS CEP CES CET CHI CIE CID CIL CIS CLE COB COL COM CON COQ COR COS COU CRI CRU CUL
-DAB DAG DAL DAM DAN DER DES DIA DIT DIX DOL DOM DON DOT DOS DRU DST DUO DUC DUR DYN DYS
-EAU EBE ECU EON EGO ELU EMU EPI ERE ERS ERG EST ETA ETE ETC ETH EUH EUX EXO
-FAR FAT FAX FEE FER FEU FEZ FIC FIL FIN FOC FOI FOL FOR FOU FUR FUT
-GAG GAI GAZ GEL GIN GLU GPS GOY GRE GUE GUI GUS
-HAI HAN HEM HEP HEU HIC HIE HIP HOC HOM HOP HOU HUE HUI
-ICI IDE ILE ION IRE ISO IVE
-JAN JAS JET JEU JOB JUS KAN KIN KHI KIF KIR KIT KOB KSI
-LAC LAD LAI LAS LES LEZ LIE LIN LIS LIT LOB LOF LOI LOK LOS LOT LUI LUT LUX LYS
-MAI MAL MAN MAS MAT MEC MER MES MET MIE MIL MIR MOI MOL MON MOT MOU MUE MUR MYE MYO
-NEF NEM NEO NET NEZ NIB NID NIT NOM NON NOS NUE NUL
-OBI OCA OCT ODE OFF OHE OHM OIE OIL OLE ONC OUI OPE ORD OSE OST ORT OUF OVE OVI OVO OXY OYE
-PAF PAL PAN PAR PAS PAT PER PET PEU PHI PIE PIC PIF PIS PIU PLI POP POT POU PRO PSI PUB PUR PUY
-QCM QUE QUI
-RAB RAD RAI RAM RAS RAT RAP RAZ REA REG REM REZ RHO RIA RIB RIF RIS RIT RIZ ROI ROB ROC ROM ROS ROT RUE RUT RUZ RYE
-SAC SAI SAR SAS SEL SEN SEC SEP SES SET SIC SIL SIS SIX SKA SKI SOI SOL SON SOS SOT SOU SOY SPA SPE SPI SUB SUC SUD SUE SUR SUS SVP
-TAC TAN TAF TAG TAO TAS TAU TEE TEK TEL TER TES TET TEX THE TIC TIF TIL TIN TIR TIP TOC TOI TOM TOT TOP TOX TRI TSF TUB TUE TUF
-ULM UNE UNI URE URO USE
-VAD VAL VAN VEL VER VIA VIE VIF VIL VIN VIS VIT VOL VOS VUE
-WAX WEB WON WOK XYL YAK YIN YEN YOD ZAC ZAD ZEE ZEN ZIG ZIP ZOE ZOO ZOU ZUP ZUT ZZZ`;
 
-let grid=Array(9).fill("");
-let touched=Array(9).fill(false);
-let selected=null;
-let LVL="VERT";
+/* ===== STOCKAGE PAR COULEUR ===== */
+const STATES={VERT:null,BLEU:null,ROUGE:null,NOIR:null};
 
-/* ===== DICO ===== */
+/* ===== DONNÉES ===== */
+const RAW_WORDS=`ABC ACE ADO AGA AGE AHI AIE AIL AIR AIS ALE ALU AME AMI ANA ANE API ARA ARE ARC ARS ART AUX AVE AXE BAC BAH BAI BAL BAN BAR BAS BAT BAU BEE BEC BEL BEN BER BEY BIO BIS BIT BLE BOA BOF BOL BON BOT BOX BOY BRU BUN BUS BUT CAB CAO CAL CAP CAR CAS CEP CES CET CHI CIE CID CIL CIS CLE COB COL COM CON COQ COR COS COU CRI CRU CUL DAB DAG DAL DAM DAN DER DES DIA DIT DIX DOL DOM DON DOT DOS DRU DST DUO DUC DUR DYN DYS
+EAU EBE ECU EON EGO ELU EMU EPI ERE ERS ERG EST ETA ETE ETC ETH EUH EUX EXO FAR FAT FAX FEE FER FEU FEZ FIC FIL FIN FOC FOI FOL FOR FOU FUR FUT
+GAG GAI GAZ GEL GIN GLU GPS GOY GRE GUE GUI GUS HAI HAN HEM HEP HEU HIC HIE HIP HOC HOM HOP HOU HUE HUI ICI IDE ILE ION IRE ISO IVE JAN JAS JET JEU JOB JUS KAN KIN KHI KIF KIR KIT KOB KSI LAC LAD LAI LAS LES LEZ LIE LIN LIS LIT LOB LOF LOI LOK LOS LOT LUI LUT LUX LYS MAI MAL MAN MAS MAT MEC MER MES MET MIE MIL MIR MOI MOL MON MOT MOU MUE MUR MYE MYO NEF NEM NEO NET NEZ NIB NID NIT NOM NON NOS NUE NUL OBI OCA OCT ODE OFF OHE OHM OIE OIL OLE ONC OUI OPE ORD OSE OST ORT OUF OVE OVI OVO OXY OYE PAF PAL PAN PAR PAS PAT PER PET PEU PHI PIE PIC PIF PIS PIU PLI POP POT POU PRO PSI PUB PUR PUY QCM QUE QUI RAB RAD RAI RAM RAS RAT RAP RAZ REA REG REM REZ RHO RIA RIB RIF RIS RIT RIZ ROI ROB ROC ROM ROS ROT RUE RUT RUZ RYE
+SAC SAI SAR SAS SEL SEN SEC SEP SES SET SIC SIL SIS SIX SKA SKI SOI SOL SON SOS SOT SOU SOY SPA SPE SPI SUB SUC SUD SUE SUR SUS SVP TAN TAF TAG TAO TAS TAU TEE TEK TEL TER TES TET TEX THE TIC TIF TIL TIN TIR TIP TOC TOI TOM TOT TOP TOX TRI TSF TUB TUE TUF ULM UNE UNI URE URO USE VAD VAL VAN VEL VER VIA VIE VIF VIL VIN VIS VIT VOL VOS VUE WAX WEB WON WOK XYL YAK YIN YEN YOD ZAC ZAD ZEE ZEN ZIG ZIP ZOE ZOO ZOU ZUP ZUT ZZZ`;
 const WORDS=RAW_WORDS.split(/\s+/);
 const ALLOWED=new Set(WORDS);
 const DICO={};
-WORDS.forEach(w=>{(DICO[w[0]]??=[]).push(w)});
+WORDS.forEach(w=>(DICO[w[0]]??=[]).push(w));
 Object.keys(DICO).forEach(k=>DICO[k]=[...new Set(DICO[k])].sort());
 
 function chunk8(a){
@@ -206,14 +179,11 @@ function chunk8(a){
   return r.join("\n");
 }
 
-/* ✅ MODIF ICI : option vide avant A + pas d’affichage par défaut */
 function setupDico(){
   dicoSelect.innerHTML="";
-
-  // option vide (choix utilisateur)
   const empty=document.createElement("option");
   empty.value="";
-  empty.textContent="";   // affichage vide
+  empty.textContent="";
   dicoSelect.appendChild(empty);
 
   Object.keys(DICO).sort().forEach(L=>{
@@ -223,18 +193,20 @@ function setupDico(){
     dicoSelect.appendChild(o);
   });
 
-  dicoSelect.value="";       // vide par défaut
-  dicoWords.textContent="";  // aucun mot affiché
+  dicoSelect.value="";
+  dicoWords.textContent="";
 }
 
 function renderDico(){
   const v=dicoSelect.value;
-  if(!v){
-    dicoWords.textContent="";
-    return;
-  }
-  dicoWords.textContent=chunk8(DICO[v]||[]);
+  dicoWords.textContent=v?chunk8(DICO[v]||[]):"";
 }
+
+/* ===== VARIABLES ===== */
+let grid=Array(9).fill("");
+let touched=Array(9).fill(false);
+let selected=null;
+let LVL="VERT";
 
 /* ===== GRILLE ===== */
 function initGrid(){
@@ -246,6 +218,7 @@ function initGrid(){
     gridDiv.appendChild(c);
   }
 }
+
 function refresh(){
   document.querySelectorAll(".cell").forEach((c,i)=>{
     c.textContent=grid[i];
@@ -254,6 +227,7 @@ function refresh(){
     if(selected===i)c.classList.add("selected");
   });
 }
+
 function cellClick(i){
   if(grid[i]){grid[i]="";touched[i]=true;selected=null}
   else selected=i;
@@ -268,6 +242,7 @@ function key(L){
   k.onclick=()=>{if(selected!==null){grid[selected]=L;touched[selected]=true;selected=null;refresh()}};
   return k;
 }
+
 function initKeyboards(){
   voyelles.innerHTML="";
   const vrow=document.createElement("div");vrow.className="keyboard-row";
@@ -282,13 +257,50 @@ function initKeyboards(){
   });
 }
 
-/* ===== CLAVIER PC ===== */
-document.addEventListener("keydown",e=>{
-  if(selected===null)return;
-  const k=e.key.toUpperCase();
-  if(k>="A"&&k<="Z"){grid[selected]=k;touched[selected]=true;selected=null;refresh();e.preventDefault()}
-  if(e.key==="Backspace"||e.key==="Delete"){grid[selected]="";touched[selected]=true;selected=null;refresh();e.preventDefault()}
-});
+/* ===== CLAVIER COULEUR ===== */
+function setKeyboard(m){
+  document.body.classList.remove("clavier-noir","clavier-blanc");
+  document.body.classList.add(m==="noir"?"clavier-noir":"clavier-blanc");
+}
+function setKeyboardAuto(){
+  document.body.classList.remove("clavier-noir","clavier-blanc");
+}
+
+/* ===== SAUVEGARDE ===== */
+function saveState(){
+  STATES[LVL]={grid:[...grid],touched:[...touched],selected};
+}
+
+/* ===== NIVEAU ===== */
+function setLvl(l){
+
+  if(l!==LVL) saveState();
+
+  LVL=l;
+
+  if(STATES[l]){
+    grid=[...STATES[l].grid];
+    touched=[...STATES[l].touched];
+    selected=STATES[l].selected;
+  } else {
+    grid=Array(9).fill("");
+    touched=Array(9).fill(false);
+    selected=null;
+    randomVowel();
+  }
+
+  gridWrapper.className=l.toLowerCase();
+  setKeyboardAuto();
+  initKeyboards();
+  setupDico();
+  refresh();
+}
+
+/* ===== NOUVELLE PARTIE ===== */
+function nouvelle(){
+  STATES[LVL]=null;
+  setLvl(LVL);
+}
 
 /* ===== JEU ===== */
 function randomVowel(){
@@ -297,30 +309,38 @@ function randomVowel(){
   grid[p]=v[Math.floor(Math.random()*v.length)];
   touched[p]=true;
 }
-function setKeyboard(m){
-  document.body.classList.remove("clavier-noir","clavier-blanc");
-  document.body.classList.add(m==="noir"?"clavier-noir":"clavier-blanc");
-}
-function setKeyboardAuto(){document.body.classList.remove("clavier-noir","clavier-blanc")}
-function setLvl(l){
-  LVL=l;grid.fill("");touched.fill(false);selected=null;
-  gridWrapper.className=l.toLowerCase();
-  setKeyboardAuto();
-  initKeyboards();
-  setupDico();     // ✅ dico vide par défaut
-  randomVowel();   /* ← aussi en NOIR */
-  refresh();
-}
-function nouvelle(){setLvl(LVL)}
+
 function valider(){
-  if(grid.some(x=>!x)){showModal("<h2>✗ Grille non valide</h2>Grille incomplète.");return}
-  const w=[
-    grid[0]+grid[1]+grid[2],grid[3]+grid[4]+grid[5],grid[6]+grid[7]+grid[8],
-    grid[0]+grid[3]+grid[6],grid[1]+grid[4]+grid[7],grid[2]+grid[5]+grid[8]
+
+  // 1. grille complète ?
+  if(grid.some(x=>!x)){
+    showModal("<h2>✗ Grille non valide</h2>Grille incomplète.");
+    return;
+  }
+
+  // 2. lignes
+  const rows=[
+    grid[0]+grid[1]+grid[2],
+    grid[3]+grid[4]+grid[5],
+    grid[6]+grid[7]+grid[8]
   ];
-  showModal(w.every(x=>ALLOWED.has(x))
-    ?"<h2>🎉 Bravo !</h2>Grille valide !"
-    :"<h2>✗ Grille non valide</h2>Vous pouvez continuer.");
+
+  // 3. colonnes
+  const cols=[
+    grid[0]+grid[3]+grid[6],
+    grid[1]+grid[4]+grid[7],
+    grid[2]+grid[5]+grid[8]
+  ];
+
+  // 4. vérification dictionnaire
+  const ok=[...rows,...cols].every(w=>ALLOWED.has(w));
+
+  // 5. résultat
+  if(ok){
+    showModal("<h2>🎉 BRAVO !</h2>Grille valide !");
+  }else{
+    showModal("<h2>✗ Grille non valide</h2>Vous pouvez continuer.");
+  }
 }
 
 /* ===== POPUP ===== */
@@ -330,14 +350,9 @@ function showModal(html){
   modalBg.style.display="block";
   modalBg.onclick=()=>modalBg.style.display="none";
 }
+
 function showRules(){
-  showModal(`
-    <h2>COMMENT JOUER ?</h2>
-    Choisir une couleur de grille.<br><br>
-    Cliquez sur une case de la grille puis tapez une lettre au clavier<br><br>
-    Pour effacer : cliquez sur la lettre choisie<br><br>
-    🎉 Bonne partie !
-  `);
+  showModal("Cliquez sur une case puis tapez une lettre.");
 }
 
 /* ===== INIT ===== */
@@ -352,6 +367,7 @@ const modalBox=document.getElementById("modalBox");
 
 initGrid();
 setLvl("VERT");
+
 </script>
 
 </body>
