@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -243,6 +243,33 @@ function key(L){
   return k;
 }
 
+document.addEventListener("keydown", e => {
+
+  if (["INPUT", "TEXTAREA"].includes(document.activeElement.tagName)) return;
+
+  if(selected === null) return;
+
+  const k = e.key.toUpperCase();
+
+  // 🔤 Lettres
+  if(k.length === 1 && k >= "A" && k <= "Z"){
+    grid[selected] = k;
+    touched[selected] = true;
+    selected = null;
+    refresh();
+    e.preventDefault();
+  }
+
+  // ⌫ Effacer
+  if(e.key === "Backspace" || e.key === "Delete"){
+    grid[selected] = "";
+    touched[selected] = true;
+    selected = null;
+    refresh();
+    e.preventDefault();
+  }
+});
+
 function initKeyboards(){
   voyelles.innerHTML="";
   const vrow=document.createElement("div");vrow.className="keyboard-row";
@@ -371,4 +398,4 @@ setLvl("VERT");
 </script>
 
 </body>
-</html>
+</html>﻿
